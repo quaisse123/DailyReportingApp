@@ -151,15 +151,20 @@ import os
 import firebase_admin
 from firebase_admin import credentials
 
-# Définition du chemin vers le fichier de clé privée Firebase (à obtenir depuis la console Firebase)
-FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'firebase-credentials.json')
+import json
 
-# Initialisation du SDK Firebase Admin si le fichier de clé existe
-if os.path.exists(FIREBASE_CREDENTIALS_PATH):
-    # Chargement des informations d'identification à partir du fichier
-    cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
-    # Initialisation de l'application Firebase avec les informations d'identification
-    firebase_admin.initialize_app(cred)
+# Initialisation de Firebase selon l'environnement
+if not firebase_admin._apps:
+    if os.getenv("FIREBASE_CREDENTIALS"):  # Cas Render
+        cred_info = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
+        cred = credentials.Certificate(cred_info)
+        firebase_admin.initialize_app(cred)
+    else:  # Cas local
+        FIREBASE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'firebase-credentials.json')
+        if os.path.exists(FIREBASE_CREDENTIALS_PATH):
+            cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
+            firebase_admin.initialize_app(cred)
+
 
 # Importation de timedelta pour définir la durée de vie des tokens JWT
 from datetime import timedelta
