@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.egg-info/
+*.egg
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Django
+*.sqlite3
+db.sqlite3
+/staticfiles/
+media/
+*.log
+*.pot
+*.pyc
+
+# Sensitive
+.env
+firebase-credentials.json
+secret_key.txt
+
+# IDE / Editor
+.vscode/
+.idea/
+*.iml

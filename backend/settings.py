@@ -182,3 +182,39 @@ SIMPLE_JWT = {
 
 # Définition du modèle utilisateur personnalisé pour Django
 AUTH_USER_MODEL = 'AuthApi.CustomUser'
+
+
+# Configuration pour déployer l'application 
+# sur render.com avec gestion des fichiers statiques via WhiteNoise
+import os
+import dj_database_url
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent  # Définit le répertoire racine du projet
+
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-e)++8!h1)t&%6cge23_(d$ck=fn%)-oj3-s9!#xguo+wy5s%(9')  # Clé secrète, configurable via variable d'environnement
+
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'  # Mode debug, configurable via variable d'environnement
+
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')  # Hôtes autorisés, configurable via variable d'environnement
+
+DATABASES = {
+    'default': dj_database_url.config(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")  # Configuration de la base de données via URL, par défaut SQLite
+}
+
+STATIC_URL = '/static/'  # URL d'accès aux fichiers statiques
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Répertoire où collecter les fichiers statiques lors du déploiement
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',      # Middleware de sécurité
+    'whitenoise.middleware.WhiteNoiseMiddleware',         # Sert les fichiers statiques en production
+    'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # Utilise WhiteNoise pour compresser et gérer les fichiers statiques
