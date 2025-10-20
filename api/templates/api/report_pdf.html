@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport Journalier</title>
+    <style>
+        /* Variables et styles de base */
+        :root {
+            --primary: #1a365d;
+            --secondary: #2b6cb0;
+            --accent: #ed8936;
+            --success: #48bb78;
+            --light-bg: #f7fafc;
+            --border: #e2e8f0;
+            --text: #2d3748;
+            --text-light: #718096;
+            --white: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+            color: var(--text);
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+        }
+        
+        /* Header principal */
+        .report-main-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 2.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .report-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+        }
+        
+        .report-date {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Statistiques */
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-title {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        /* Commentaires généraux */
+        .comments-card {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        /* Entreprises et zones */
+        .contractor-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        
+        .contractor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--secondary);
+            padding: 1rem 1.5rem;
+            color: var(--white);
+        }
+        
+        .contractor-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            flex: 1;
+        }
+        
+        .contractor-logo {
+            max-height: 60px;
+            max-width: 120px;
+            margin-left: 2rem;
+            object-fit: contain;
+        }
+        
+        .zone-container {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .zone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .zone-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            display: inline-block;
+        }
+        
+        /* Équipements */
+        .equipment-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .equipment-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .equipment-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .equipment-item {
+            background-color: var(--light-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .equipment-quantity {
+            font-weight: bold;
+            color: var(--secondary);
+            margin-left: 0.5rem;
+        }
+        
+        /* Activités */
+        .activities-container {
+            margin-top: 1.5rem;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .activity-card {
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--success);
+        }
+        
+        .activity-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.75rem;
+        }
+        
+        .activity-comments {
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        
+        /* Photos */
+        .photo-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .photo-container {
+            width: 200px;
+            height: 150px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- En-tête du rapport -->
+        <div class="report-main-header">
+            <h1 class="report-title">Rapport Journalier</h1>
+            <div class="report-date">{{ report.date }}</div>
+        </div>
+        
+        <!-- Statistiques -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">{{ report.report_contractors.all|length }}</div>
+                <div class="stat-label">Entreprises</div>
+            </div>
+            <div class="stat-card">
+                {% with zone_count=0 %}
+                    {% for rc in report.report_contractors.all %}
+                        {% for zone in rc.zones.all %}
+                            {% with zone_count=zone_count|add:1 %}{% endwith %}
+                        {% endfor %}
+                    {% endfor %}
+                    <div class="stat-value">{{ zone_count }}</div>
+                {% endwith %}
+                <div class="stat-label">Zones</div>
+            </div>
+            <div class="stat-card">
+                {% with activity_count=0 %}
+                    {% for rc in report.report_contractors.all %}
+                        {% for zone in rc.zones.all %}
+                            {% for activity in zone.activities.all %}
+                                {% with activity_count=activity_count|add:1 %}{% endwith %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                    <div class="stat-value">{{ activity_count }}</div>
+                {% endwith %}
+                <div class="stat-label">Activités</div>
+            </div>
+        </div>
+        
+        <!-- Commentaires généraux -->
+        {% if report.comments %}
+        <div class="comments-card">
+            <h3>Commentaires généraux</h3>
+            <p>{{ report.comments }}</p>
+        </div>
+        {% endif %}
+        
+        <!-- Entreprises et zones -->
+        <div class="section">
+            <h2 class="section-title">Détails par entreprise</h2>
+            
+            {% for rc in report.report_contractors.all %}
+            <div class="contractor-card">
+                <div class="contractor-header">
+                    <h3 class="contractor-name">{{ rc.contractor.name }}</h3>
+                    {% if rc.contractor.logo %}
+                    <img src="{{ rc.contractor.logo.url }}" alt="Logo {{ rc.contractor.name }}" class="contractor-logo">
+                    {% endif %}
+                </div>
+                
+                {% for zone in rc.zones.all %}
+                <div class="zone-container">
+                    <div class="zone-header">
+                        <div class="zone-name">Zone: {{ zone.zone.name }}</div>
+                    </div>
+                    
+                    <!-- Équipements -->
+                    {% if zone.equipment_assignments.all %}
+                    <div class="equipment-container">
+                        <div class="equipment-title">Équipements</div>
+                        <ul class="equipment-list">
+                            {% for eq in zone.equipment_assignments.all %}
+                            <li class="equipment-item">
+                                {{ eq.equipment.name }} 
+                                <span class="equipment-quantity">× {{ eq.quantity }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Activités -->
+                    {% if zone.activities.all %}
+                    <div class="activities-container">
+                        <div class="activity-title">Activités</div>
+                        {% for act in zone.activities.all %}
+                        <div class="activity-card">
+                            <div class="activity-name">{{ act.name }}</div>
+                            {% if act.comments %}
+                            <div class="activity-comments">{{ act.comments }}</div>
+                            {% endif %}
+                            
+                            {% if act.photos.all %}
+                            <div class="photo-gallery">
+                                {% for photo in act.photos.all %}
+                                <div class="photo-container">
+                                    <img src="{{ photo.image.url }}" alt="Photo d'activité">
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
