@@ -54,7 +54,7 @@ pdfminer.six==20250506
 pdfplumber==0.11.7
 pdfrw==0.4
 pilkit==3.0
-Pillow==10.1.0
+Pillow==9.5.0
 portalocker==3.2.0
 proto-plus==1.26.1
 protobuf==6.32.0
