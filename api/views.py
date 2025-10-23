@@ -162,26 +162,80 @@ from .models import DailyReport  # Import du modèle DailyReport
 from rest_framework.decorators import api_view, permission_classes  # Pour créer une vue API basée sur une fonction
 from rest_framework.permissions import IsAuthenticated  # Pour restreindre l'accès aux utilisateurs authentifiés
 
-@api_view(['GET'])  # Déclare que cette vue accepte uniquement les requêtes GET
-@permission_classes([IsAuthenticated])  # Restreint l'accès à la vue aux utilisateurs connectés
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def generate_report_pdf(request, report_id):
-    # Récupère le rapport avec toutes les relations nécessaires pour éviter les requêtes supplémentaires
+    # Récupération du rapport (inchangé)
     report = DailyReport.objects.prefetch_related(
-        'report_contractors__contractor',  # Précharge les contractants liés au rapport
-        'report_contractors__zones__zone',  # Précharge les zones liées aux contractants du rapport
-        'report_contractors__zones__equipment_assignments__equipment',  # Précharge les équipements assignés dans chaque zone
-        'report_contractors__zones__activities__photos'  # Précharge les photos des activités dans chaque zone
-    ).get(id=report_id, user=request.user)  # Filtre sur l'id du rapport et l'utilisateur connecté
+        'report_contractors__contractor',
+        'report_contractors__zones__zone',
+        'report_contractors__zones__equipment_assignments__equipment',
+        'report_contractors__zones__activities__photos'
+    ).get(id=report_id, user=request.user)
 
-    # Prépare le contexte à passer au template HTML
+    # Contexte pour le template
     context = {'report': report}
-    # Rend le template HTML en chaîne de caractères avec le contexte
+    
+    # Rendu du template HTML
     html_string = render_to_string('api/report_pdf.html', context)
-    # Génère le PDF à partir du HTML rendu
-    pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf()
-    # Crée une réponse HTTP avec le PDF comme contenu
+    
+    # Créer un fetcher d'URL personnalisé qui accède aux fichiers localement
+    def custom_url_fetcher(url):
+        from django.conf import settings
+        import os
+        from PIL import Image
+        from io import BytesIO
+        
+        # Si l'URL contient '/media/', c'est une ressource locale
+        if '/media/' in url:
+            # Extraire le chemin relatif du fichier média
+            media_path = url.split('/media/')[1]
+            # Construire le chemin absolu sur le système de fichiers
+            file_path = os.path.join(settings.MEDIA_ROOT, media_path)
+            
+            # Si c'est une image, optimisons-la
+            if any(file_path.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.jfif']):
+                # Ouvrir et optimiser l'image
+                try:
+                    img = Image.open(file_path)
+                    
+                    # Redimensionner si trop grande (limite à 1000px de largeur/hauteur)
+                    max_size = 1000
+                    if img.width > max_size or img.height > max_size:
+                        img.thumbnail((max_size, max_size), Image.LANCZOS)
+                    
+                    # Convertir en mode RGB si nécessaire (pour les PNG avec transparence)
+                    if img.mode in ('RGBA', 'LA'):
+                        background = Image.new(img.mode[:-1], img.size, (255, 255, 255))
+                        background.paste(img, mask=img.split()[-1])
+                        img = background
+                    
+                    # Sauvegarder en mémoire avec compression
+                    output = BytesIO()
+                    img.save(output, format='JPEG', quality=80, optimize=True)
+                    output.seek(0)
+                    
+                    # Retourner l'image optimisée
+                    return {'file_obj': output, 'mime_type': 'image/jpeg'}
+                except Exception as e:
+                    print(f"Erreur lors de l'optimisation de l'image {file_path}: {e}")
+                    # En cas d'échec, on essaie d'ouvrir normalement
+            
+            # Pour les fichiers non-image ou si l'optimisation a échoué
+            return {'file_obj': open(file_path, 'rb'), 'mime_type': ''}
+            
+        # Pour les URLs externes, utiliser le comportement par défaut
+        import urllib.request
+        return {'file_obj': urllib.request.urlopen(url)}
+    
+    # Générer le PDF avec notre fetcher personnalisé
+    pdf_file = HTML(
+        string=html_string,
+        base_url=request.build_absolute_uri(),
+        url_fetcher=custom_url_fetcher  # Utiliser notre fetcher personnalisé
+    ).write_pdf()
+    
+    # Réponse HTTP (inchangé)
     response = HttpResponse(pdf_file, content_type='application/pdf')
-    # Définit le nom du fichier PDF à télécharger
     response['Content-Disposition'] = f'attachment; filename="rapport_{report.date}.pdf"'
-    # Retourne la réponse HTTP contenant le PDF
     return response

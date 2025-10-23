@@ -308,12 +308,9 @@
             <div class="contractor-card">
                 <div class="contractor-header">
                     <h3 class="contractor-name">{{ rc.contractor.name }}</h3>
-
-
-                    
-                    {% if rc.contractor.thumbnail %}
-    <img src="{{ rc.contractor.thumbnail.url }}" alt="Logo {{ rc.contractor.name }}" class="contractor-logo">
-{% endif %}
+                    {% if rc.contractor.logo %}
+                    <img src="{{ rc.contractor.logo.url }}" alt="Logo {{ rc.contractor.name }}" class="contractor-logo">
+                    {% endif %}
                 </div>
                 
                 {% for zone in rc.zones.all %}
@@ -347,22 +344,16 @@
                             {% if act.comments %}
                             <div class="activity-comments">{{ act.comments }}</div>
                             {% endif %}
-                            {% comment %} =========================================== {% endcomment %}
+                            
                             {% if act.photos.all %}
-                                <div class="photo-gallery">
-                                    {% for photo in act.photos.all %}
-                                    <div class="photo-container">
-                                        {% if photo.thumbnail %}
-                                            <img src="{{ photo.thumbnail.url }}" alt="Photo d'activité">
-                                        {% else %}
-                                            <img src="{{ photo.image.url }}" alt="Photo d'activité">
-                                        {% endif %}
-                                    </div>
-                                    {% endfor %}
+                            <div class="photo-gallery">
+                                {% for photo in act.photos.all %}
+                                <div class="photo-container">
+                                    <img src="{{ photo.image.url }}" alt="Photo d'activité">
                                 </div>
+                                {% endfor %}
+                            </div>
                             {% endif %}
-
-
                         </div>
                         {% endfor %}
                     </div>
