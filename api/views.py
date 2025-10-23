@@ -184,46 +184,45 @@ def generate_report_pdf(request, report_id):
     
     # Créer un fetcher d'URL personnalisé qui accède aux fichiers localement
     def custom_url_fetcher(url):
-    from django.conf import settings
-    from PIL import Image
-    from io import BytesIO
-    
-    if '/media/' in url:
-        media_path = url.split('/media/')[1]
-        file_path = os.path.join(settings.MEDIA_ROOT, media_path)
+        from django.conf import settings
+        import os
+        from PIL import Image
+        from io import BytesIO
         
-        if any(file_path.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.jfif']):
-            try:
-                # Ouvrir l'image
-                img = Image.open(file_path)
-                
-                # Convertir en RGB si nécessaire (important pour les images en mode P/palette)
-                if img.mode in ('P', 'RGBA', 'LA'):
-                    img = img.convert('RGB')
-                
-                # Redimensionner si trop grande
-                max_size = 1000
-                if img.width > max_size or img.height > max_size:
-                    img.thumbnail((max_size, max_size), Image.LANCZOS)
-                
-                # Sauvegarder en mémoire avec compression
-                output = BytesIO()
-                img.save(output, format='JPEG', quality=80, optimize=True)
-                output.seek(0)
-                
-                return {'file_obj': output, 'mime_type': 'image/jpeg'}
-                
-            except Exception as e:
-                print(f"Erreur lors de l'optimisation de l'image {file_path}: {e}")
-                # En cas d'échec, essayer d'ouvrir le fichier directement
-                return {'file_obj': open(file_path, 'rb'), 'mime_type': ''}
-        
-        # Pour les fichiers non-image
-        return {'file_obj': open(file_path, 'rb'), 'mime_type': ''}
+        if '/media/' in url:
+            media_path = url.split('/media/')[1]
+            file_path = os.path.join(settings.MEDIA_ROOT, media_path)
+            
+            if any(file_path.lower().endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.jfif']):
+                try:
+                    # Ouvrir l'image
+                    img = Image.open(file_path)
+                    
+                    # Convertir en RGB si nécessaire (important pour les images en mode P/palette)
+                    if img.mode in ('P', 'RGBA', 'LA'):
+                        img = img.convert('RGB')
+                    
+                    # Redimensionner si trop grande
+                    max_size = 1000
+                    if img.width > max_size or img.height > max_size:
+                        img.thumbnail((max_size, max_size), Image.LANCZOS)
+                    
+                    # Sauvegarder en mémoire avec compression
+                    output = BytesIO()
+                    img.save(output, format='JPEG', quality=80, optimize=True)
+                    output.seek(0)
+                    
+                    return {'file_obj': output, 'mime_type': 'image/jpeg'}
+                    
+                except Exception as e:
+                    print(f"Erreur lors de l'optimisation de l'image {file_path}: {e}")
+                    # En cas d'échec, essayer d'ouvrir le fichier directement
+                    return {'file_obj': open(file_path, 'rb'), 'mime_type': ''}
+            
+            # Pour les fichiers non-image
+            return {'file_obj': open(file_path, 'rb'), 'mime_type': ''}
     
-    # Rejeter les URLs externes
-    from django.http import Http404
-    raise Http404(f"Ressource non trouvée: {url}")
+    
         # Pour les URLs externes, utiliser le comportement par défaut
         import urllib.request
         return {'file_obj': urllib.request.urlopen(url)}
