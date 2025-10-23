@@ -165,6 +165,9 @@ from rest_framework.permissions import IsAuthenticated  # Pour restreindre l'acc
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def generate_report_pdf(request, report_id):
+    print("Génération du pdf optimisé ======================================================================")
+    print("=================================================================================================")
+
     # Récupération du rapport (inchangé)
     report = DailyReport.objects.prefetch_related(
         'report_contractors__contractor',
